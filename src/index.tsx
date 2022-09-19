@@ -1,23 +1,33 @@
+import "reflect-metadata";
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
-import { MainLoop } from './main/MainLoop';
-import "reflect-metadata";
+import { container } from 'tsyringe';
+import { GameStateStorage } from "./GameStateStorage";
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+export default class Index {
+  constructor() {
+    this.startApp();
+  }
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+  private startApp(): void {
+    const root = ReactDOM.createRoot(
+      document.getElementById('root') as HTMLElement
+    );
 
-new MainLoop();
+    setInterval(this.loop, 1000, root);
+  }
+
+  private loop(root: ReactDOM.Root): void { 
+    let gameMetadata = container.resolve(GameStateStorage);
+    root.render(
+      <React.StrictMode>
+        <App cookies={gameMetadata.getCookies()}/>
+      </React.StrictMode>
+    );
+    console.log(gameMetadata.getCookies());
+  }
+}
+
+new Index();
